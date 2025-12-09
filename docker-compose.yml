@@ -1,0 +1,68 @@
+version: "3.9"
+services:
+  dev-db:
+    container_name: dev-db
+    image: postgres:16-alpine
+    profiles: ["standalone"]
+    env_file:
+      - ./db.env
+    volumes:
+      - dev-db:/var/lib/postgresql/data
+      - ./clean_db.sql:/docker-entrypoint-initdb.d/clean_db.sql
+    healthcheck:
+      # ПРИПУЩЕННЯ: Використовуємо змінні з db.env або стандартного користувача postgres
+      test: [ "CMD-SHELL", "pg_isready -U ctb_user -d db" ] 
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - app-net
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    env_file:
+      - ./db.env
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis:/root/redis
+    networks:
+      - app-net
+    healthcheck:
+      # Healthcheck включає авторизацію через змінну оточення
+      test: [ "CMD-SHELL", "redis-cli -a \"$REDIS_PASSWORD\" --raw incr ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  dev-bot:
+    container_name: dev-bot
+    build:
+      context: ../control-time-bot
+      target: development
+    profiles: ["standalone", "integrated"]
+    volumes:
+      - ./:/bot
+    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client /bot/bot.py
+    ports:
+      - "5678:5678"
+    environment:
+      - PYDEVD_DISABLE_FILE_VALIDATION=1
+    restart: always
+    networks:
+      app-net: {}
+    depends_on:
+      redis:
+        condition: service_healthy   
+      dev-db:
+        condition: service_healthy
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  dev-db:
+  redis:
