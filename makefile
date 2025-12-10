@@ -7,21 +7,70 @@ ENV_FILE ?= .env.dev
 up:
 	docker compose --env-file $(ENV_FILE) up -d
 
-# Зупинити всі
+# Зупинити всі проєкти
 down:
 	docker compose down
 
-# Перезапустити всі
+# Перезапустити всі проєкти
 restart:
 	$(MAKE) down
 	$(MAKE) up
 
-# === INDIVIDUAL PROJECTS ===
+# Показати статус контейнерів
+ps:
+	docker compose ps
 
-# Приклад: make postgres
+# Показати логи всіх сервісів
+logs:
+	docker compose logs -f
+
+# Зупинити всі проєкти (без видалення)
+stop:
+	docker compose stop
+
+# Запустити зупинені проєкти
+start:
+	docker compose start
+
+# Перебудовувати і запустити
+build:
+	docker compose --env-file $(ENV_FILE) up -d --build
+
+# === INDIVIDUAL SERVICES ===
+
+# Запустити тільки PostgreSQL
 postgres:
 	docker compose --env-file $(ENV_FILE) up -d dev-db
 
-# Приклад: make bot
+# Запустити тільки Redis
+redis:
+	docker compose --env-file $(ENV_FILE) up -d redis
+
+# Запустити тільки бот
 bot:
 	docker compose --env-file $(ENV_FILE) up -d dev-bot
+
+# Логи PostgreSQL
+logs-postgres:
+	docker compose logs -f dev-db
+
+# Логи Redis
+logs-redis:
+	docker compose logs -f redis
+
+# Логи бот
+logs-bot:
+	docker compose logs -f dev-bot
+
+# === CLEANUP COMMANDS ===
+# Очистити всі контейнери, мережі та volumes
+clean:
+	docker compose down -v --remove-orphans
+
+# Очистити тільки зупинені контейнери
+clean-containers:
+	docker compose rm -f
+
+# Показати використання ресурсів
+stats:
+	docker stats
