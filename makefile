@@ -38,17 +38,21 @@ build:
 
 # === INDIVIDUAL SERVICES ===
 
-# Запустити тільки PostgreSQL
+#  PostgreSQL
 postgres:
 	docker compose --env-file $(ENV_FILE) up -d dev-db
 
-# Запустити тільки Redis
+#  Redis
 redis:
 	docker compose --env-file $(ENV_FILE) up -d redis
 
-# Запустити тільки бот
+# Запустити бот
 bot:
 	docker compose --env-file $(ENV_FILE) up -d dev-bot
+
+# Рестарт бот
+bot-res: 	
+	docker compose restart dev-bot	
 
 # Логи PostgreSQL
 logs-postgres:
@@ -67,7 +71,7 @@ logs-bot:
 clean:
 	docker compose down -v --remove-orphans
 
-# Очистити тільки зупинені контейнери
+# Очистити   зупинені контейнери
 clean-containers:
 	docker compose rm -f
 

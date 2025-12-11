@@ -52,7 +52,8 @@ services:
     profiles: ["standalone", "integrated"]
     volumes:
       - ../control-time-bot:/bot
-    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client /bot/bot.py
+    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client /bot/bot_root.py
+    #command: bash -c "python /bot/bot_root.py; tail -F /dev/null"
     ports:
       - "5678:5678"
     env_file:

@@ -16,8 +16,8 @@ docker compose --env-file .env.dev up -d
 ```
 # make up   - запустити всі проєкти
 # make down - зупинити всі проєкти
-# make postgres - запустити тільки postgres
-# make bot  - запустити тільки бот
+# make postgres -  postgres
+# make bot  -  бот
 # make restart - перезапустити всі
 # make postgres ENV_FILE=.env.prod - запустити postgres з продакшн конфігом
 ```
