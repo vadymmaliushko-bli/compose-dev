@@ -48,7 +48,7 @@ redis:
 
 # Запустити бот
 bot:
-	docker compose --env-file $(ENV_FILE) up -d dev-bot
+	docker compose --env-file $(ENV_FILE) up -d --force-recreate dev-bot
 
 # Рестарт бот
 bot-res: 	
@@ -78,3 +78,6 @@ clean-containers:
 # Показати використання ресурсів
 stats:
 	docker stats
+
+sonda:
+	docker compose --env-file $(ENV_FILE) up -d --force-recreate sonda-api	
